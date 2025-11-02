@@ -3,9 +3,8 @@ import React from "react";
 import { allProjects } from "contentlayer/generated";
 import { Navigation } from "../components/nav";
 import { Card } from "../components/card";
-import { Article } from "./article";
 import { Redis } from "@upstash/redis";
-import { Eye } from "lucide-react";
+import { Eye, ArrowRight } from "lucide-react";
 
 const redis = Redis.fromEnv();
 
@@ -40,24 +39,30 @@ export default async function ProjectsPage() {
   return (
     <div className="relative pb-16">
       <Navigation />
-      <div className="px-6 pt-20 mx-auto space-y-8 max-w-7xl lg:px-8 md:space-y-16 md:pt-24 lg:pt-32">
-        <div className="max-w-2xl mx-auto lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl">
+      <div className="px-6 pt-20 mx-auto max-w-7xl lg:px-8 md:pt-24 lg:pt-32">
+        {/* Hero Section */}
+        <div className="max-w-2xl mx-auto lg:mx-0 mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
             Projects
-          </h2>
-          <p className="mt-4 text-zinc-400">
-            Some of the projects are from work and some are on my own time.
+          </h1>
+          <p className="text-lg text-zinc-400 leading-relaxed">
+            A collection of work spanning development, design, and innovation.
           </p>
         </div>
-        <div className="w-full h-px bg-zinc-800" />
 
-        {/* Featured Projects Grid - Top Row */}
-        <div className="grid grid-cols-1 gap-6 mx-auto lg:grid-cols-3">
+        {/* Featured Projects - Two Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
           <Card>
             <Link href={`/projects/${featured.slug}`}>
-              <article className="relative w-full h-full p-6 md:p-8">
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <div className="text-xs text-zinc-100">
+              <article className="relative w-full h-full p-8 lg:p-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center gap-2 text-sm text-zinc-300">
+                    <Eye className="w-4 h-4" />
+                    {Intl.NumberFormat("en-US", { notation: "compact" }).format(
+                      views[featured.slug] ?? 0,
+                    )}
+                  </div>
+                  <div className="text-sm text-zinc-400">
                     {featured.date ? (
                       <time dateTime={new Date(featured.date).toISOString()}>
                         {Intl.DateTimeFormat(undefined, {
@@ -65,26 +70,23 @@ export default async function ProjectsPage() {
                         }).format(new Date(featured.date))}
                       </time>
                     ) : (
-                      <span>SOON</span>
+                      <span>Coming Soon</span>
                     )}
                   </div>
-                  <span className="flex items-center gap-1 text-xs text-zinc-500">
-                    <Eye className="w-4 h-4" />{" "}
-                    {Intl.NumberFormat("en-US", { notation: "compact" }).format(
-                      views[featured.slug] ?? 0,
-                    )}
-                  </span>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-zinc-100 group-hover:text-white font-display mb-3">
+                
+                <h2 className="text-2xl lg:text-3xl font-bold text-white font-display mb-4">
                   {featured.title}
                 </h2>
-                <p className="text-sm md:text-base leading-6 duration-150 text-zinc-400 group-hover:text-zinc-300">
+                
+                <p className="text-zinc-300 text-lg leading-relaxed mb-8">
                   {featured.description}
                 </p>
-                <div className="absolute bottom-6 left-6 right-6">
-                  <p className="text-zinc-200 hover:text-zinc-50 text-sm">
-                    Read more <span aria-hidden="true">&rarr;</span>
-                  </p>
+                
+                <div className="absolute bottom-8 right-8">
+                  <div className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 group-hover:scale-110">
+                    <ArrowRight className="w-5 h-5 text-white" />
+                  </div>
                 </div>
               </article>
             </Link>
@@ -92,48 +94,153 @@ export default async function ProjectsPage() {
 
           <Card>
             <Link href={`/projects/${top2.slug}`}>
-              <Article project={top2} views={views[top2.slug] ?? 0} />
-            </Link>
-          </Card>
-
-          <Card>
-            <Link href={`/projects/${top3.slug}`}>
-              <Article project={top3} views={views[top3.slug] ?? 0} />
+              <article className="relative w-full h-full p-8 lg:p-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center gap-2 text-sm text-zinc-300">
+                    <Eye className="w-4 h-4" />
+                    {Intl.NumberFormat("en-US", { notation: "compact" }).format(
+                      views[top2.slug] ?? 0,
+                    )}
+                  </div>
+                  <div className="text-sm text-zinc-400">
+                    {top2.date ? (
+                      <time dateTime={new Date(top2.date).toISOString()}>
+                        {Intl.DateTimeFormat(undefined, {
+                          dateStyle: "medium",
+                        }).format(new Date(top2.date))}
+                      </time>
+                    ) : (
+                      <span>Coming Soon</span>
+                    )}
+                  </div>
+                </div>
+                
+                <h2 className="text-2xl lg:text-3xl font-bold text-white font-display mb-4">
+                  {top2.title}
+                </h2>
+                
+                <p className="text-zinc-300 text-lg leading-relaxed mb-8">
+                  {top2.description}
+                </p>
+                
+                <div className="absolute bottom-8 right-8">
+                  <div className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 group-hover:scale-110">
+                    <ArrowRight className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+              </article>
             </Link>
           </Card>
         </div>
-        <div className="hidden w-full h-px md:block bg-zinc-800" />
 
-        {/* Additional Projects Grid - Consistent 3-column layout */}
-        <div className="grid grid-cols-1 gap-6 mx-auto lg:mx-0 md:grid-cols-3">
-          <div className="grid grid-cols-1 gap-6">
-            {sorted
-              .filter((_, i) => i % 3 === 0)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
-          <div className="grid grid-cols-1 gap-6">
-            {sorted
-              .filter((_, i) => i % 3 === 1)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
-          <div className="grid grid-cols-1 gap-6">
-            {sorted
-              .filter((_, i) => i % 3 === 2)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
+        {/* Additional Projects - Same Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+          {sorted.slice(0, 2).map((project) => (
+            <Card key={project.slug}>
+              <Link href={`/projects/${project.slug}`}>
+                <article className="relative w-full h-full p-8 lg:p-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center gap-2 text-sm text-zinc-300">
+                      <Eye className="w-4 h-4" />
+                      {Intl.NumberFormat("en-US", { notation: "compact" }).format(
+                        views[project.slug] ?? 0,
+                      )}
+                    </div>
+                    <div className="text-sm text-zinc-400">
+                      {project.date ? (
+                        <time dateTime={new Date(project.date).toISOString()}>
+                          {Intl.DateTimeFormat(undefined, {
+                            dateStyle: "medium",
+                          }).format(new Date(project.date))}
+                        </time>
+                      ) : (
+                        <span>Coming Soon</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-2xl lg:text-3xl font-bold text-white font-display mb-4">
+                    {project.title}
+                  </h2>
+                  
+                  <p className="text-zinc-300 text-lg leading-relaxed mb-8">
+                    {project.description}
+                  </p>
+                  
+                  <div className="absolute bottom-8 right-8">
+                    <div className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 group-hover:scale-110">
+                      <ArrowRight className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            </Card>
+          ))}
         </div>
+
+        {/* Full-width Call to Action Section */}
+        <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-2xl p-12 lg:p-16 text-center">
+          <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+            Want to collaborate?
+          </h3>
+          <p className="text-xl text-zinc-300 mb-8 max-w-2xl mx-auto">
+            I'm always interested in discussing new projects and opportunities.
+          </p>
+          <Link 
+            href="/contact" 
+            className="inline-flex items-center gap-2 bg-white text-zinc-900 px-8 py-3 rounded-full font-semibold hover:bg-zinc-100 transition-colors"
+          >
+            Get in touch
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Remaining Projects */}
+        {sorted.length > 2 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mt-16">
+            {sorted.slice(2).map((project) => (
+              <Card key={project.slug}>
+                <Link href={`/projects/${project.slug}`}>
+                  <article className="relative w-full h-full p-8 lg:p-10">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="flex items-center gap-2 text-sm text-zinc-300">
+                        <Eye className="w-4 h-4" />
+                        {Intl.NumberFormat("en-US", { notation: "compact" }).format(
+                          views[project.slug] ?? 0,
+                        )}
+                      </div>
+                      <div className="text-sm text-zinc-400">
+                        {project.date ? (
+                          <time dateTime={new Date(project.date).toISOString()}>
+                            {Intl.DateTimeFormat(undefined, {
+                              dateStyle: "medium",
+                            }).format(new Date(project.date))}
+                          </time>
+                        ) : (
+                          <span>Coming Soon</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <h2 className="text-2xl lg:text-3xl font-bold text-white font-display mb-4">
+                      {project.title}
+                    </h2>
+                    
+                    <p className="text-zinc-300 text-lg leading-relaxed mb-8">
+                      {project.description}
+                    </p>
+                    
+                    <div className="absolute bottom-8 right-8">
+                      <div className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 group-hover:scale-110">
+                        <ArrowRight className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
