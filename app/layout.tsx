@@ -1,6 +1,7 @@
 import "../global.css";
 import { Inter } from "@next/font/google";
 import LocalFont from "@next/font/local";
+import { Switzer } from "@next/font/google";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
 
@@ -55,13 +56,18 @@ const calSans = LocalFont({
   variable: "--font-calsans",
 });
 
+const switzer = Switzer({
+  subsets: ["latin"],
+  variable: "--font-switzer",
+});
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={[inter.variable, calSans.variable].join(" ")}>
+    <html lang="en" className={[inter.variable, calSans.variable, switzer.variable].join(" ")}>
       <head>
         <Analytics />
       </head>

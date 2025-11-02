@@ -66,14 +66,17 @@ export default function WelcomeLoader({ onComplete }: WelcomeLoaderProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black"
+      className="fixed inset-0 z-50 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: isExiting ? 0 : 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1.2, ease: "easeInOut" }}
     >
-      {/* Pure black background with subtle depth */}
-      <div className="absolute inset-0 bg-black" />
+      {/* Gradient overlay from dark - appears from darkness */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-black to-zinc-900 opacity-95" />
+      
+      {/* Subtle radial gradient for depth */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/50" />
 
       {/* Main content container - ultra minimal */}
       <div className="relative z-10 text-center px-8 max-w-6xl mx-auto">
@@ -115,19 +118,9 @@ export default function WelcomeLoader({ onComplete }: WelcomeLoaderProps) {
             }}
             className="mb-12"
           >
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-light text-white tracking-[0.1em] mb-8 leading-none">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-light text-white tracking-[0.1em] mb-8 leading-none font-[var(--font-switzer)]">
               {currentTranslation.text}
             </h1>
-            
-            {/* Ultra-subtle language indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
-              transition={{ delay: 1, duration: 1 }}
-              className="text-sm text-zinc-500 font-light tracking-widest uppercase"
-            >
-              {currentTranslation.lang}
-            </motion.div>
           </motion.div>
         </AnimatePresence>
 
