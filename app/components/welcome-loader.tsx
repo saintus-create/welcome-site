@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const welcomeTranslations = [
@@ -16,9 +16,6 @@ const welcomeTranslations = [
   { text: "مرحبا", lang: "Arabic", code: "ar" },
   { text: "Добро пожаловать", lang: "Russian", code: "ru" },
   { text: "Welkom", lang: "Dutch", code: "nl" },
-  { text: " добродошлица", lang: "Serbian", code: "sr" },
-  { text: "ยินดีต้อนรับ", lang: "Thai", code: "th" },
-  { text: "Välkommen", lang: "Swedish", code: "sv" },
 ];
 
 interface WelcomeLoaderProps {
@@ -28,21 +25,37 @@ interface WelcomeLoaderProps {
 export default function WelcomeLoader({ onComplete }: WelcomeLoaderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const exitTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear all timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (currentIndex >= welcomeTranslations.length) {
-      setIsComplete(true);
-      setTimeout(() => {
+      // Smooth exit transition
+      setIsExiting(true);
+      exitTimerRef.current = setTimeout(() => {
+        setIsComplete(true);
         onComplete();
-      }, 500);
+      }, 800);
       return;
     }
 
-    const timer = setTimeout(() => {
+    // Smoother, more iPhone-like timing
+    timerRef.current = setTimeout(() => {
       setCurrentIndex((prev) => prev + 1);
-    }, 1200); // Change language every 1.2 seconds
+    }, 2200); // 2.2 seconds per language - more deliberate pace
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [currentIndex, onComplete]);
 
   const currentTranslation = welcomeTranslations[currentIndex];
@@ -51,108 +64,147 @@ export default function WelcomeLoader({ onComplete }: WelcomeLoaderProps) {
     return null;
   }
 
+  // Calculate smooth progress (0-100)
+  const progress = ((currentIndex + 1) / welcomeTranslations.length) * 100;
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: isExiting ? 0 : 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]"></div>
-      </div>
+      {/* Subtle background with depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-black to-zinc-950" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03),transparent_70%)]" />
 
-      {/* Main content */}
-      <div className="relative z-10 text-center">
-        {/* Language indicator */}
+      {/* Main content container */}
+      <div className="relative z-10 text-center px-8 max-w-4xl mx-auto">
+        
+        {/* Progress indicator - more subtle */}
         <motion.div
-          className="mb-4"
-          initial={{ opacity: 0, y: -20 }}
+          className="mb-12"
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <span className="text-xs text-zinc-500 tracking-wider uppercase">
-            Language {currentIndex + 1} of {welcomeTranslations.length}
-          </span>
+          <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 tracking-[0.2em] uppercase">
+            <div className="w-1 h-1 bg-zinc-600 rounded-full" />
+            <span>Initializing Experience</span>
+            <div className="w-1 h-1 bg-zinc-600 rounded-full" />
+          </div>
         </motion.div>
 
-        {/* Welcome text */}
+        {/* Main welcome text with enhanced animations */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.2, y: -20 }}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.95 }}
             transition={{
-              duration: 0.6,
-              ease: [0.25, 0.46, 0.45, 0.94],
+              duration: 0.8,
+              ease: [0.25, 0.1, 0.25, 1],
             }}
-            className="relative"
+            className="mb-8"
           >
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-display text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-100 to-zinc-400 mb-4">
+            <h1 className="text-7xl md:text-8xl lg:text-9xl font-thin text-white tracking-tight mb-6 leading-none">
               {currentTranslation.text}
             </h1>
             
-            {/* Language name */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="text-lg text-zinc-400"
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="text-xl text-zinc-400 font-light tracking-wide"
             >
               {currentTranslation.lang}
             </motion.p>
           </motion.div>
         </AnimatePresence>
 
-        {/* Progress bar */}
+        {/* Smoother progress bar */}
         <motion.div
-          className="mt-8 w-64 h-1 bg-zinc-800 rounded-full overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          className="mx-auto w-80 h-0.5 bg-zinc-900 rounded-full overflow-hidden"
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-white to-zinc-300 rounded-full"
+            className="h-full bg-gradient-to-r from-white via-zinc-200 to-white rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${((currentIndex + 1) / welcomeTranslations.length) * 100}%` }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            animate={{ width: `${progress}%` }}
+            transition={{
+              duration: 0.8,
+              ease: [0.4, 0, 0.2, 1],
+            }}
           />
         </motion.div>
 
-        {/* Loading dots */}
+        {/* Subtle loading indicator */}
         <motion.div
-          className="mt-6 flex justify-center space-x-2"
+          className="mt-8 flex justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
         >
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-2 h-2 bg-zinc-600 rounded-full"
-              animate={{
-                opacity: [0.3, 1, 0.3],
-                scale: [0.8, 1.2, 0.8],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                delay: i * 0.2,
-              }}
-            />
-          ))}
+          <motion.div
+            className="flex space-x-1"
+            animate={{
+              opacity: [0.3, 1, 0.3],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-1 h-1 bg-zinc-600 rounded-full"
+                animate={{
+                  scale: [1, 1.4, 1],
+                  opacity: [0.4, 1, 0.4],
+                }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Decorative elements */}
-      <div className="absolute top-1/4 left-1/4 w-px h-16 bg-gradient-to-b from-transparent to-zinc-700 opacity-50"></div>
-      <div className="absolute top-1/4 right-1/4 w-px h-16 bg-gradient-to-b from-transparent to-zinc-700 opacity-50"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-px h-16 bg-gradient-to-t from-transparent to-zinc-700 opacity-50"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-px h-16 bg-gradient-to-t from-transparent to-zinc-700 opacity-50"></div>
+      {/* Elegant corner accents */}
+      <motion.div
+        className="absolute top-8 left-8 w-12 h-px bg-gradient-to-r from-transparent to-zinc-700"
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 1, delay: 0.6 }}
+      />
+      <motion.div
+        className="absolute top-8 right-8 w-12 h-px bg-gradient-to-l from-transparent to-zinc-700"
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 1, delay: 0.6 }}
+      />
+      <motion.div
+        className="absolute bottom-8 left-8 w-12 h-px bg-gradient-to-r from-transparent to-zinc-700"
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 1, delay: 0.6 }}
+      />
+      <motion.div
+        className="absolute bottom-8 right-8 w-12 h-px bg-gradient-to-l from-transparent to-zinc-700"
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 1, delay: 0.6 }}
+      />
     </motion.div>
   );
 }
